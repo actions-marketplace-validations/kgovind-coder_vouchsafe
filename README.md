@@ -85,48 +85,42 @@ your existing AI security stack — see **[docs/COMPARISON.md](docs/COMPARISON.m
 
 ## Install
 
-Vouchsafe ships as a **single signed binary** for Linux, macOS, and Windows. No Python, no `pip`, no virtualenv needed. Pick whichever option matches your environment:
+Pick the option that matches how you work. Most people want **option 1**.
 
-### Linux
+### 1. Desktop app (one-click installer — recommended)
 
-```bash
-curl -L https://github.com/kgovind-coder/vouchsafe/releases/latest/download/vouchsafe-linux-x64 \
-    -o /usr/local/bin/vouchsafe && chmod +x /usr/local/bin/vouchsafe
-vouchsafe --version
-```
+No terminal, no PATH, no checksum dance. Download, run the installer, launch Vouchsafe from your Start menu / Applications / app launcher, drag a folder onto the window, click **Scan**.
 
-### macOS (Intel + Apple Silicon, universal binary)
+| OS | Download | Size |
+|---|---|---|
+| **Windows 10/11** | [`vouchsafe-setup.exe`](https://github.com/kgovind-coder/vouchsafe/releases/latest/download/vouchsafe-setup.exe) | ~80 MB |
+| **macOS** (Intel + Apple Silicon) | [`Vouchsafe-v0.3.0.dmg`](https://github.com/kgovind-coder/vouchsafe/releases/latest/download/Vouchsafe-v0.3.0.dmg) | ~90 MB |
+| **Linux** (any modern distro) | [`Vouchsafe-v0.3.0-x86_64.AppImage`](https://github.com/kgovind-coder/vouchsafe/releases/latest/download/Vouchsafe-v0.3.0-x86_64.AppImage) | ~95 MB |
 
-```bash
-curl -L https://github.com/kgovind-coder/vouchsafe/releases/latest/download/vouchsafe-macos-universal \
-    -o /usr/local/bin/vouchsafe && chmod +x /usr/local/bin/vouchsafe
+> **macOS first run:** Right-click the app → **Open** → **Open** (one-time Gatekeeper bypass; the binary is unsigned by Apple but its SHA-256 is published below).
+> **Linux AppImage:** `chmod +x Vouchsafe-v0.3.0-x86_64.AppImage` then double-click.
 
-# First run on macOS may need to clear the gatekeeper quarantine attribute:
-xattr -d com.apple.quarantine /usr/local/bin/vouchsafe 2>/dev/null || true
+### 2. Command line (single binary)
 
-vouchsafe --version
-```
+For terminal users, CI runners, or anyone who wants `vouchsafe scan ./repo` in a shell.
 
-### Windows (PowerShell)
+| OS | Binary | Checksum |
+|---|---|---|
+| Linux x64 | [`vouchsafe-linux-x64`](https://github.com/kgovind-coder/vouchsafe/releases/latest/download/vouchsafe-linux-x64) | [`.sha256`](https://github.com/kgovind-coder/vouchsafe/releases/latest/download/vouchsafe-linux-x64.sha256) |
+| macOS universal | [`vouchsafe-macos-universal`](https://github.com/kgovind-coder/vouchsafe/releases/latest/download/vouchsafe-macos-universal) | [`.sha256`](https://github.com/kgovind-coder/vouchsafe/releases/latest/download/vouchsafe-macos-universal.sha256) |
+| Windows x64 | [`vouchsafe-windows-x64.exe`](https://github.com/kgovind-coder/vouchsafe/releases/latest/download/vouchsafe-windows-x64.exe) | [`.sha256`](https://github.com/kgovind-coder/vouchsafe/releases/latest/download/vouchsafe-windows-x64.sha256) |
 
-```powershell
-$dest = "$env:USERPROFILE\AppData\Local\Programs\vouchsafe"
-New-Item -ItemType Directory -Force -Path $dest | Out-Null
-Invoke-WebRequest `
-  -Uri "https://github.com/kgovind-coder/vouchsafe/releases/latest/download/vouchsafe-windows-x64.exe" `
-  -OutFile "$dest\vouchsafe.exe"
-# Add to PATH for this session (add it permanently via System Properties):
-$env:Path = "$dest;$env:Path"
-vouchsafe --version
-```
+Download, mark it executable (Linux/macOS: `chmod +x vouchsafe-*`), move it onto your `PATH`, and run `vouchsafe --version`.
 
-### Docker (multi-arch: amd64 + arm64)
+### 3. Docker (multi-arch: amd64 + arm64)
 
 ```bash
 docker run --rm -v "$PWD":/scan ghcr.io/kgovind-coder/vouchsafe:latest scan /scan
 ```
 
-### GitHub Action
+### 4. GitHub Action (run Vouchsafe on every PR)
+
+Published on the [GitHub Marketplace](https://github.com/marketplace/actions/vouchsafe-ai-inventory-scan). Add to any workflow:
 
 ```yaml
 - uses: kgovind-coder/vouchsafe@v0.3.0
@@ -135,19 +129,9 @@ docker run --rm -v "$PWD":/scan ghcr.io/kgovind-coder/vouchsafe:latest scan /sca
     formats: json,sarif
 ```
 
-### Verify your download
+### All assets + checksums
 
-Every binary ships with a `.sha256` checksum file at the same URL with `.sha256` appended. Verify before use:
-
-```bash
-# Linux / macOS:
-shasum -a 256 -c vouchsafe-linux-x64.sha256
-
-# Windows PowerShell:
-$expected = (Get-Content vouchsafe-windows-x64.sha256) -replace ' .+',''
-$actual = (Get-FileHash vouchsafe-windows-x64.exe -Algorithm SHA256).Hash.ToLower()
-if ($actual -eq $expected) { "OK" } else { "MISMATCH" }
-```
+Every asset (installers, binaries, `.sha256` files) is listed on the [v0.3.0 release page](https://github.com/kgovind-coder/vouchsafe/releases/tag/v0.3.0). Future releases land at the same URL with the new tag.
 
 ## Quickstart
 
